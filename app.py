@@ -14,6 +14,13 @@ st.set_page_config(
 # Initialize database
 db.init_db()
 
+# Auto-create admin user on first run if it doesn't exist
+try:
+    if not db.verify_user("admin", "admin123"):
+        db.create_user("admin", "admin123", "admin@nascar36.com", is_admin=True)
+except:
+    pass
+
 # Session state initialization
 if 'user' not in st.session_state:
     st.session_state.user = None
