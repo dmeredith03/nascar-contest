@@ -95,6 +95,8 @@ def show_home_page():
             st.session_state.page = 'my_picks'
         if st.button("👥 All Picks", width='stretch'):
             st.session_state.page = 'all_picks'
+        if st.button("📖 Rules", width='stretch'):
+            st.session_state.page = 'rules'
         
         if st.session_state.user['is_admin']:
             st.divider()
@@ -119,6 +121,8 @@ def show_home_page():
         show_my_picks_page()
     elif st.session_state.page == 'all_picks':
         show_all_picks_page()
+    elif st.session_state.page == 'rules':
+        show_rules_page()
     elif st.session_state.page == 'admin' and st.session_state.user['is_admin']:
         show_admin_page()
 
@@ -245,7 +249,7 @@ def show_picks_page():
     
     if existing_pick:
         st.success(f"✅ Current pick: **{existing_pick['driver_name']}**")
-        st.info("You can change your pick until the race is completed")
+        st.info("You can change your pick until race day")
     
     # Driver selection
     st.divider()
@@ -368,15 +372,31 @@ def show_all_picks_page():
     """Display all users' picks for races"""
     st.header("👥 All Picks by Race")
     
+    from datetime import datetime, date
+    
     races = db.get_all_races()
     
     if not races:
         st.info("No races available yet")
         return
     
-    # Filter to show only races that have started or completed
-    # For now, show all races for demo purposes, but you could filter by date
-    race_options = {f"Race {r['race_number']}: {r['race_name']} ({r['race_date']})": r for r in races}
+    # Filter to show only races that have reached race day or are completed
+    today = date.today()
+    available_races = []
+    for race in races:
+        try:
+            race_date = datetime.strptime(race['race_date'], '%Y-%m-%d').date()
+            if today >= race_date or race['is_completed']:
+                available_races.append(race)
+        except:
+            # If date parsing fails, include the race
+            available_races.append(race)
+    
+    if not available_races:
+        st.info("No race picks are available to view yet. Picks become visible on race day.")
+        return
+    
+    race_options = {f"Race {r['race_number']}: {r['race_name']} ({r['race_date']})": r for r in available_races}
     
     selected_race_name = st.selectbox("Select a race to view picks", list(race_options.keys()))
     selected_race = race_options[selected_race_name]
@@ -436,6 +456,79 @@ def show_all_picks_page():
                     st.write(f"🏆 **{row['username']}** - {row['driver_name']} ({int(row['points'])} pts)")
     else:
         st.info("No picks have been made for this race yet")
+
+
+def show_rules_page():
+    """Display contest rules"""
+    st.header("📖 Contest Rules")
+    
+    st.markdown("""
+    ## NASCAR 36 for 36 - One and Done Contest
+    
+    ### Basic Rules
+    
+    1. **36 Races, 36 Different Drivers**
+       - Pick one driver for each of the 36 Cup Series races
+       - Each driver can only be picked ONCE during the entire season
+       - Once you use a driver, they're locked for the rest of the season
+    
+    2. **Strategic Planning Required**
+       - Plan ahead! You can't pick the same driver twice
+       - Save your favorite drivers for tracks where they perform best
+       - Consider driver/track history when making selections
+    
+    3. **One Entry Per Person**
+       - Each participant gets one entry for the season
+       - Pick wisely - your choices matter!
+    
+    ---
+    
+    ### Points System
+    
+    Points are awarded based on each driver's **total race points**, which include:
+    - Stage 1 points
+    - Stage 2 points  
+    - Finishing position points
+    - Any bonus points earned
+    
+    Your picked driver earns you whatever points they score in that race!
+    
+    **Example:**
+    - Driver wins race with stage points: You get their full point total (could be 50-60+ points)
+    - Driver finishes mid-pack: You get their race points (15-30 points)
+    - Driver has issues and finishes last: You get minimal points (1-5 points)
+    
+    ---
+    
+    ### When Picks Lock
+    
+    ⏰ **Picks lock at 12:00 AM (midnight) on race day**
+    
+    - You can change your pick anytime **before race day**
+    - Once it's race day, your pick is final
+    - If you don't make a pick by race day, a random available driver will be assigned to you
+    - Late picks are NOT accepted once the race begins
+    
+    ---
+    
+    ### Scoring & Winning
+    
+    - **Leaderboard**: Updated after each race with total points
+    - **Winner**: Highest total points after all 36 races
+    - **Tiebreaker**: If tied, most wins (1st place finishes) breaks the tie
+    
+    ---
+    
+    ### Tips for Success
+    
+    🎯 **Strategy Matters!**
+    - Look at the full schedule before making picks
+    - Consider track types (road courses, superspeedways, short tracks, intermediates)
+    - Save elite drivers for races where they historically dominate
+    - Don't waste top drivers on unpredictable races (superspeedways, rain races)
+    
+    🏁 **Good luck and enjoy the season!**
+    """)
 
 
 def show_admin_page():
