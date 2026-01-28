@@ -3,7 +3,7 @@ import database as db
 from datetime import datetime
 import pandas as pd
 import io
-import extra_streamlit_components as stx
+from streamlit_cookies_manager import EncryptedCookieManager
 
 # Page config
 st.set_page_config(
@@ -12,8 +12,14 @@ st.set_page_config(
     layout="wide"
 )
 
-# Initialize cookie manager
-cookie_manager = stx.CookieManager()
+# Initialize cookie manager - this must be called early
+cookies = EncryptedCookieManager(
+    prefix="nascar_",
+    password="nascar-36for36-secret-key-change-in-production"  # Change this in production
+)
+
+if not cookies.ready():
+    st.stop()
 
 # Initialize database
 db.init_db()
@@ -30,13 +36,12 @@ if 'user' not in st.session_state:
     st.session_state.user = None
 if 'page' not in st.session_state:
     st.session_state.page = 'login'
-if 'checked_cookie' not in st.session_state:
-    st.session_state.checked_cookie = False
+if 'cookies' not in st.session_state:
+    st.session_state.cookies = cookies
 
 # Check for persistent login via cookie
-if not st.session_state.checked_cookie and st.session_state.user is None:
-    cookies = cookie_manager.get_all()
-    session_token = cookies.get('nascar_session')
+if st.session_state.user is None:
+    session_token = cookies.get('session_token')
     
     if session_token:
         user = db.verify_session(session_token)
@@ -44,9 +49,9 @@ if not st.session_state.checked_cookie and st.session_state.user is None:
             st.session_state.user = user
             st.session_state.page = 'home'
     
-    st.session_state.checked_cookie = True
     # Clean up old sessions periodically
     db.cleanup_expired_sessions()
+
 
 
 def show_login_page():
@@ -72,7 +77,8 @@ def show_login_page():
                         
                         # Create persistent session
                         session_token = db.create_session(user['id'])
-                        cookie_manager.set('nascar_session', session_token, max_age=30*24*60*60)  # 30 days
+                        st.session_state.cookies['session_token'] = session_token
+                        st.session_state.cookies.save()
                         
                         st.rerun()
                     else:
@@ -133,15 +139,14 @@ def show_home_page():
         st.divider()
         if st.button("🚪 Logout", width='stretch'):
             # Delete session from database
-            cookies = cookie_manager.get_all()
-            session_token = cookies.get('nascar_session')
+            session_token = st.session_state.cookies.get('session_token')
             if session_token:
                 db.delete_session(session_token)
-                cookie_manager.delete('nascar_session')
+                del st.session_state.cookies['session_token']
+                st.session_state.cookies.save()
             
             st.session_state.user = None
             st.session_state.page = 'login'
-            st.session_state.checked_cookie = False
             st.rerun()
     
     # Main content based on selected page
