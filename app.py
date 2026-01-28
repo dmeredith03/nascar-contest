@@ -465,69 +465,82 @@ def show_rules_page():
     st.markdown("""
     ## NASCAR 36 for 36 - One and Done Contest
     
-    ### Basic Rules
+    ### Format
     
-    1. **36 Races, 36 Different Drivers**
-       - Pick one driver for each of the 36 Cup Series races
-       - Each driver can only be picked ONCE during the entire season
-       - Once you use a driver, they're locked for the rest of the season
-    
-    2. **Strategic Planning Required**
-       - Plan ahead! You can't pick the same driver twice
-       - Save your favorite drivers for tracks where they perform best
-       - Consider driver/track history when making selections
-    
-    3. **One Entry Per Person**
-       - Each participant gets one entry for the season
-       - Pick wisely - your choices matter!
+    - 36 Cup Series races
+    - Pick one driver per race
+    - Each driver can only be used once all season
+    - No re-use of drivers under any circumstances
     
     ---
     
     ### Points System
     
-    Points are awarded based on each driver's **total race points**, which include:
-    - Stage 1 points
-    - Stage 2 points  
-    - Finishing position points
-    - Any bonus points earned
+    You receive the total points your selected driver earns in the race. Points are awarded as follows:
     
-    Your picked driver earns you whatever points they score in that race!
+    **Race Finish Points (2026):**
     
-    **Example:**
-    - Driver wins race with stage points: You get their full point total (could be 50-60+ points)
-    - Driver finishes mid-pack: You get their race points (15-30 points)
-    - Driver has issues and finishes last: You get minimal points (1-5 points)
+    | Place | Points | Place | Points | Place | Points | Place | Points |
+    |-------|--------|-------|--------|-------|--------|-------|--------|
+    | 1st   | 55     | 11th  | 26     | 21st  | 16     | 31st  | 6      |
+    | 2nd   | 35     | 12th  | 25     | 22nd  | 15     | 32nd  | 5      |
+    | 3rd   | 34     | 13th  | 24     | 23rd  | 14     | 33rd  | 4      |
+    | 4th   | 33     | 14th  | 23     | 24th  | 13     | 34th  | 3      |
+    | 5th   | 32     | 15th  | 22     | 25th  | 12     | 35th  | 2      |
+    | 6th   | 31     | 16th  | 21     | 26th  | 11     | 36th  | 1      |
+    | 7th   | 30     | 17th  | 20     | 27th  | 10     | 37th  | 1      |
+    | 8th   | 29     | 18th  | 19     | 28th  | 9      | 38th  | 1      |
+    | 9th   | 28     | 19th  | 18     | 29th  | 8      | 39th  | 1      |
+    | 10th  | 27     | 20th  | 17     | 30th  | 7      | 40th  | 1      |
     
-    ---
+    **Stage Points (Stages 1 & 2):**
     
-    ### When Picks Lock
+    Top 10 finishers in each stage: 1st = 10, 2nd = 9, 3rd = 8, 4th = 7, 5th = 6, 6th = 5, 7th = 4, 8th = 3, 9th = 2, 10th = 1
     
-    ⏰ **Picks lock at 12:00 AM (midnight) on race day**
+    **Fastest Lap Bonus:**
     
-    - You can change your pick anytime **before race day**
-    - Once it's race day, your pick is final
-    - If you don't make a pick by race day, a random available driver will be assigned to you
-    - Late picks are NOT accepted once the race begins
+    1 point to the driver who records the fastest single lap (once a car enters the garage, it's no longer eligible)
     
-    ---
-    
-    ### Scoring & Winning
-    
-    - **Leaderboard**: Updated after each race with total points
-    - **Winner**: Highest total points after all 36 races
-    - **Tiebreaker**: If tied, most wins (1st place finishes) breaks the tie
+    **Maximum Points:** Win both stages + win race + fastest lap = 10 + 10 + 55 + 1 = 76 points
     
     ---
     
-    ### Tips for Success
+    ### Picking Deadline
     
-    🎯 **Strategy Matters!**
-    - Look at the full schedule before making picks
-    - Consider track types (road courses, superspeedways, short tracks, intermediates)
-    - Save elite drivers for races where they historically dominate
-    - Don't waste top drivers on unpredictable races (superspeedways, rain races)
+    Picks must be submitted by 12:00 AM (midnight) on race day. After this time:
+    - Picks are locked and cannot be changed
+    - Users who have not picked will be auto-assigned a random available driver
+    - No late picks are accepted once the race has started
     
-    🏁 **Good luck and enjoy the season!**
+    ---
+    
+    ### Scoring and Standings
+    
+    - Total points accumulated across all 36 races determines the winner
+    - Tiebreaker: Number of 1st place finishes
+    - Leaderboard updates after each race
+    
+    ---
+    
+    ### Strategy Tips
+    
+    **Track Types:**
+    - Superspeedways (Daytona, Talladega, Atlanta): Unpredictable, anyone can win
+    - Road Courses: Specialists like Allmendinger, van Gisbergen often excel
+    - Short Tracks (Bristol, Martinsville): High-contact, technical driving matters
+    - Intermediates (1.5-mile ovals): Where elite drivers typically dominate
+    
+    **Resources:**
+    - Use tools like LapRaptor to analyze driver performance by track type
+    - Review historical results at specific tracks before making picks
+    - Plan your season strategy before the first race
+    
+    **Common Mistakes to Avoid:**
+    - Using top drivers too early in the season
+    - Not accounting for track-specific performance
+    - Failing to save specialists for their best tracks
+    
+    🏁 Good luck.
     """)
 
 
