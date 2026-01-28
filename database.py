@@ -89,6 +89,18 @@ def init_db():
         )
     ''')
     
+    # Chat table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS chat_messages (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            username TEXT NOT NULL,
+            message TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+    ''')
+    
     conn.commit()
     conn.close()
 
@@ -163,6 +175,31 @@ def cleanup_expired_sessions():
     cursor.execute('DELETE FROM sessions WHERE expires_at < NOW()')
     conn.commit()
     conn.close()
+
+
+def save_chat_message(user_id: int, username: str, message: str) -> None:
+    """Save a chat message"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        'INSERT INTO chat_messages (user_id, username, message) VALUES (%s, %s, %s)',
+        (user_id, username, message)
+    )
+    conn.commit()
+    conn.close()
+
+
+def get_chat_messages(limit: int = 100) -> List[Dict]:
+    """Get recent chat messages"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        'SELECT username, message, created_at FROM chat_messages ORDER BY created_at DESC LIMIT %s',
+        (limit,)
+    )
+    messages = cursor.fetchall()
+    conn.close()
+    return list(reversed(messages)) if messages else []
 
 
 def create_user(username: str, password: str, email: str, is_admin: bool = False) -> bool:

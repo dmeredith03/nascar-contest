@@ -130,6 +130,9 @@ def show_home_page():
         if st.button("📖 Rules", width='stretch'):
             st.session_state.page = 'rules'
         
+        if st.button("💬 Chat", width='stretch'):
+            st.session_state.page = 'chat'
+        
         if st.session_state.user['is_admin']:
             st.divider()
             st.header("Admin")
@@ -162,6 +165,8 @@ def show_home_page():
         show_all_picks_page()
     elif st.session_state.page == 'rules':
         show_rules_page()
+    elif st.session_state.page == 'chat':
+        show_chat_page()
     elif st.session_state.page == 'admin' and st.session_state.user['is_admin']:
         show_admin_page()
 
@@ -822,6 +827,46 @@ def show_admin_page():
             )
         else:
             st.info("No participants yet")
+
+
+def show_chat_page():
+    """Display chat page"""
+    st.header("💬 Chat")
+    
+    # Get messages
+    messages = db.get_chat_messages(limit=100)
+    
+    # Display messages in a container
+    chat_container = st.container()
+    with chat_container:
+        if messages:
+            for msg in messages:
+                timestamp = msg['created_at'].strftime('%m/%d %I:%M %p')
+                st.markdown(f"**{msg['username']}** · {timestamp}")
+                st.markdown(f"> {msg['message']}")
+                st.markdown("")
+        else:
+            st.info("No messages yet. Be the first to chat!")
+    
+    st.divider()
+    
+    # Message input form
+    with st.form("chat_form", clear_on_submit=True):
+        message = st.text_input("Message", placeholder="Type your message...", label_visibility="collapsed")
+        col1, col2 = st.columns([4, 1])
+        with col2:
+            submit = st.form_submit_button("Send", width='stretch')
+        
+        if submit and message.strip():
+            db.save_chat_message(
+                st.session_state.user['id'],
+                st.session_state.user['username'],
+                message.strip()
+            )
+            st.rerun()
+    
+    # Auto-refresh button
+    st.button("🔄 Refresh", width='stretch')
 
 
 # Main app logic
