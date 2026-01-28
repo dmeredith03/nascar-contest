@@ -77,6 +77,18 @@ def init_db():
         )
     ''')
     
+    # Sessions table for persistent login
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS sessions (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            session_token TEXT UNIQUE NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            expires_at TIMESTAMP NOT NULL,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+    ''')
+    
     conn.commit()
     conn.close()
 
@@ -84,6 +96,73 @@ def init_db():
 def hash_password(password: str) -> str:
     """Hash password using SHA256"""
     return hashlib.sha256(password.encode()).hexdigest()
+
+
+def create_session(user_id: int) -> str:
+    """Create a new session token for a user"""
+    import secrets
+    from datetime import timedelta
+    
+    session_token = secrets.token_urlsafe(32)
+    expires_at = datetime.now() + timedelta(days=30)  # 30 day expiration
+    
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    # Delete old sessions for this user
+    cursor.execute('DELETE FROM sessions WHERE user_id = %s', (user_id,))
+    
+    # Create new session
+    cursor.execute(
+        'INSERT INTO sessions (user_id, session_token, expires_at) VALUES (%s, %s, %s)',
+        (user_id, session_token, expires_at)
+    )
+    
+    conn.commit()
+    conn.close()
+    
+    return session_token
+
+
+def verify_session(session_token: str) -> Optional[Dict]:
+    """Verify a session token and return user if valid"""
+    if not session_token:
+        return None
+    
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        SELECT u.id, u.username, u.email, u.is_admin 
+        FROM users u
+        JOIN sessions s ON u.id = s.user_id
+        WHERE s.session_token = %s AND s.expires_at > NOW()
+    ''', (session_token,))
+    
+    result = cursor.fetchone()
+    conn.close()
+    
+    if result:
+        return dict(result)
+    return None
+
+
+def delete_session(session_token: str):
+    """Delete a session (logout)"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM sessions WHERE session_token = %s', (session_token,))
+    conn.commit()
+    conn.close()
+
+
+def cleanup_expired_sessions():
+    """Remove expired sessions from database"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM sessions WHERE expires_at < NOW()')
+    conn.commit()
+    conn.close()
 
 
 def create_user(username: str, password: str, email: str, is_admin: bool = False) -> bool:

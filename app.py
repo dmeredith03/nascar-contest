@@ -3,6 +3,7 @@ import database as db
 from datetime import datetime
 import pandas as pd
 import io
+import extra_streamlit_components as stx
 
 # Page config
 st.set_page_config(
@@ -10,6 +11,9 @@ st.set_page_config(
     page_icon="🏁",
     layout="wide"
 )
+
+# Initialize cookie manager
+cookie_manager = stx.CookieManager()
 
 # Initialize database
 db.init_db()
@@ -26,6 +30,23 @@ if 'user' not in st.session_state:
     st.session_state.user = None
 if 'page' not in st.session_state:
     st.session_state.page = 'login'
+if 'checked_cookie' not in st.session_state:
+    st.session_state.checked_cookie = False
+
+# Check for persistent login via cookie
+if not st.session_state.checked_cookie and st.session_state.user is None:
+    cookies = cookie_manager.get_all()
+    session_token = cookies.get('nascar_session')
+    
+    if session_token:
+        user = db.verify_session(session_token)
+        if user:
+            st.session_state.user = user
+            st.session_state.page = 'home'
+    
+    st.session_state.checked_cookie = True
+    # Clean up old sessions periodically
+    db.cleanup_expired_sessions()
 
 
 def show_login_page():
@@ -48,6 +69,11 @@ def show_login_page():
                     if user:
                         st.session_state.user = user
                         st.session_state.page = 'home'
+                        
+                        # Create persistent session
+                        session_token = db.create_session(user['id'])
+                        cookie_manager.set('nascar_session', session_token, max_age=30*24*60*60)  # 30 days
+                        
                         st.rerun()
                     else:
                         st.error("Invalid username or password")
@@ -106,8 +132,16 @@ def show_home_page():
         
         st.divider()
         if st.button("🚪 Logout", width='stretch'):
+            # Delete session from database
+            cookies = cookie_manager.get_all()
+            session_token = cookies.get('nascar_session')
+            if session_token:
+                db.delete_session(session_token)
+                cookie_manager.delete('nascar_session')
+            
             st.session_state.user = None
             st.session_state.page = 'login'
+            st.session_state.checked_cookie = False
             st.rerun()
     
     # Main content based on selected page
