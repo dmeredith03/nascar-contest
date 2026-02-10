@@ -256,14 +256,14 @@ def show_picks_page():
                 # Get all drivers list
                 all_drivers = [
                     "Kyle Larson", "Chase Elliott", "Tyler Reddick", "Christopher Bell",
-                    "William Byron", "Denny Hamlin", "Kyle Busch", "Martin Truex Jr.",
+                    "William Byron", "Denny Hamlin", "Kyle Busch", "Chase Briscoe",
                     "Ross Chastain", "Ryan Blaney", "Joey Logano", "Brad Keselowski",
                     "Chris Buescher", "Bubba Wallace", "Alex Bowman", "Daniel Suarez",
-                    "Austin Cindric", "Chase Briscoe", "AJ Allmendinger", "Michael McDowell",
-                    "Ricky Stenhouse Jr.", "Ty Gibbs", "Todd Gilliland", "Corey LaJoie",
-                    "Erik Jones", "Justin Haley", "Noah Gragson", "Zane Smith",
-                    "Carson Hocevar", "Ryan Preece", "Harrison Burton", "Josh Berry",
-                    "Kaz Grala", "Ty Dillon", "John Hunter Nemechek", "Austin Dillon"
+                    "Austin Cindric", "Josh Berry", "AJ Allmendinger", "Michael McDowell",
+                    "Ricky Stenhouse Jr.", "Ty Gibbs", "Todd Gilliland", "Noah Gragson",
+                    "Erik Jones", "Carson Hocevar", "Zane Smith", "Austin Dillon",
+                    "John Hunter Nemechek", "Ryan Preece", "Ty Dillon", "Cole Custer",
+                    "Riley Herbst", "Cody Ware", "Connor Zilisch", "Shane van Gisbergen"
                 ]
                 
                 assigned_count, errors = db.auto_assign_picks(next_race['id'], all_drivers)
@@ -302,14 +302,14 @@ def show_picks_page():
     # Common NASCAR drivers (you can expand this list)
     all_drivers = [
         "Kyle Larson", "Chase Elliott", "Tyler Reddick", "Christopher Bell",
-        "William Byron", "Denny Hamlin", "Kyle Busch", "Martin Truex Jr.",
+        "William Byron", "Denny Hamlin", "Kyle Busch", "Chase Briscoe",
         "Ross Chastain", "Ryan Blaney", "Joey Logano", "Brad Keselowski",
         "Chris Buescher", "Bubba Wallace", "Alex Bowman", "Daniel Suarez",
-        "Austin Cindric", "Chase Briscoe", "AJ Allmendinger", "Michael McDowell",
-        "Ricky Stenhouse Jr.", "Ty Gibbs", "Todd Gilliland", "Corey LaJoie",
-        "Erik Jones", "Justin Haley", "Noah Gragson", "Zane Smith",
-        "Carson Hocevar", "Ryan Preece", "Harrison Burton", "Josh Berry",
-        "Kaz Grala", "Ty Dillon", "John Hunter Nemechek", "Austin Dillon"
+        "Austin Cindric", "Josh Berry", "AJ Allmendinger", "Michael McDowell",
+        "Ricky Stenhouse Jr.", "Ty Gibbs", "Todd Gilliland", "Noah Gragson",
+        "Erik Jones", "Carson Hocevar", "Zane Smith", "Austin Dillon",
+        "John Hunter Nemechek", "Ryan Preece", "Ty Dillon", "Cole Custer",
+        "Riley Herbst", "Cody Ware", "Connor Zilisch", "Shane van Gisbergen"
     ]
     
     # Filter out used drivers
